@@ -1,0 +1,6 @@
+# Core Dependencies for YatraLok AI/ML & Geo-Fencing System
+flask>=3.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
