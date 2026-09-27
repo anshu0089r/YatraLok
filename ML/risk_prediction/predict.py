@@ -41,13 +41,22 @@ class RiskPredictor:
         if self.model_payload and "model" in self.model_payload:
             try:
                 model = self.model_payload["model"]
-                vec = [row_to_feature_vector(clean_features)]
-                pred_label = str(model.predict(vec)[0])
+                try:
+                    import pandas as pd
+                    input_df = pd.DataFrame([clean_features])[FEATURE_COLUMNS]
+                    pred_label = str(model.predict(input_df)[0])
+                    if hasattr(model, "predict_proba"):
+                        probs = model.predict_proba(input_df)[0]
+                    else:
+                        probs = None
+                except Exception:
+                    vec = [row_to_feature_vector(clean_features)]
+                    pred_label = str(model.predict(vec)[0])
+                    probs = model.predict_proba(vec)[0] if hasattr(model, "predict_proba") else None
                 
                 # Extract confidence probability if classifier supports predict_proba
-                if hasattr(model, "predict_proba"):
-                    probs = model.predict_proba(vec)[0]
-                    classes = list(self.model_payload.get("classes", model.classes_))
+                if probs is not None:
+                    classes = list(self.model_payload.get("classes", getattr(model, "classes_", [])))
                     idx = classes.index(pred_label) if pred_label in classes else 0
                     risk_score = float(probs[idx])
                 else:

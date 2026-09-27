@@ -1,7 +1,25 @@
 import os
 from typing import Dict, Any
-from .train import load_split_data
-from .feature_engineering import FEATURE_COLUMNS
+
+try:
+    from .train import load_split_data
+    from .feature_engineering import FEATURE_COLUMNS
+except ImportError:
+    try:
+        from ML.risk_prediction.train import load_split_data
+        from ML.risk_prediction.feature_engineering import FEATURE_COLUMNS
+    except ImportError:
+        from train import load_split_data
+        from feature_engineering import FEATURE_COLUMNS
+
+
+def _resolve_path(path: str, filename: str) -> str:
+    if os.path.exists(path):
+        return path
+    local = os.path.join(os.path.dirname(__file__), filename)
+    if os.path.exists(local):
+        return local
+    return path
 
 
 def evaluate_saved_model(
@@ -11,6 +29,8 @@ def evaluate_saved_model(
     """
     Evaluate the saved serialized model on the held-out test split.
     """
+    model_path = _resolve_path(model_path, "model.pkl")
+    data_path = _resolve_path(data_path, os.path.join("data", "processed_data.csv"))
     try:
         import joblib
         from sklearn.metrics import (
@@ -33,7 +53,13 @@ def evaluate_saved_model(
 
     _, _, _, _, X_test, y_test = load_split_data(data_path)
 
-    test_preds = model.predict(X_test)
+    try:
+        import pandas as pd
+        X_test_input = pd.DataFrame(X_test, columns=FEATURE_COLUMNS)
+    except Exception:
+        X_test_input = X_test
+
+    test_preds = model.predict(X_test_input)
 
     acc = accuracy_score(y_test, test_preds)
     prec = precision_score(y_test, test_preds, average="weighted")

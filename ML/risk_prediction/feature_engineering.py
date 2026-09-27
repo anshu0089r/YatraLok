@@ -15,6 +15,7 @@ FEATURE_COLUMNS = [
 
 LABEL_TO_INT = {"LOW": 0, "MEDIUM": 1, "HIGH": 2}
 INT_TO_LABEL = {0: "LOW", 1: "MEDIUM", 2: "HIGH"}
+TARGET_COLUMN = "risk_level"
 
 
 def row_to_feature_vector(row: Dict[str, Any]) -> List[float]:
