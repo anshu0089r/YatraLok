@@ -1,5 +1,21 @@
+import os
+import sys
 from typing import Dict, List, Optional, Any
-from .haversine import haversine_distance
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
+
+try:
+    from .haversine import haversine_distance
+except (ImportError, ValueError):
+    try:
+        from geofencing.haversine import haversine_distance
+    except (ImportError, ValueError):
+        from ML.geofencing.haversine import haversine_distance
 
 
 class ZoneChecker:
