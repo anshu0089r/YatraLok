@@ -1,5 +1,13 @@
 import os
+import sys
 from typing import Dict, Any
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
 
 try:
     from .train import load_split_data

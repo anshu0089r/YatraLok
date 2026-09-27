@@ -1,6 +1,14 @@
 import os
+import sys
 import csv
 from typing import Dict, Any, List, Tuple
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
 
 try:
     from .feature_engineering import FEATURE_COLUMNS, TARGET_COLUMN

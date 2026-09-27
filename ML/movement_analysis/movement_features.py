@@ -1,12 +1,40 @@
+import os
+import sys
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from ML.geofencing.zone_checker import ZoneChecker
-from .speed_analysis import (
-    calculate_speed_from_coords,
-    calculate_stationary_duration,
-    calculate_movement_frequency,
-)
-from .route_analysis import calculate_route_deviation, calculate_remote_duration
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
+
+try:
+    from ..geofencing.zone_checker import ZoneChecker
+    from .speed_analysis import (
+        calculate_speed_from_coords,
+        calculate_stationary_duration,
+        calculate_movement_frequency,
+    )
+    from .route_analysis import calculate_route_deviation, calculate_remote_duration
+except (ImportError, ValueError):
+    try:
+        from geofencing.zone_checker import ZoneChecker
+        from speed_analysis import (
+            calculate_speed_from_coords,
+            calculate_stationary_duration,
+            calculate_movement_frequency,
+        )
+        from route_analysis import calculate_route_deviation, calculate_remote_duration
+    except (ImportError, ValueError):
+        from ML.geofencing.zone_checker import ZoneChecker
+        from ML.movement_analysis.speed_analysis import (
+            calculate_speed_from_coords,
+            calculate_stationary_duration,
+            calculate_movement_frequency,
+        )
+        from ML.movement_analysis.route_analysis import calculate_route_deviation, calculate_remote_duration
 
 
 class MovementFeatureExtractor:

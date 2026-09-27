@@ -1,10 +1,33 @@
 import os
+import sys
 from typing import Dict, Any, Optional
-from .feature_engineering import (
-    FEATURE_COLUMNS,
-    row_to_feature_vector,
-    generate_risk_explanation,
-)
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
+
+try:
+    from .feature_engineering import (
+        FEATURE_COLUMNS,
+        row_to_feature_vector,
+        generate_risk_explanation,
+    )
+except (ImportError, ValueError):
+    try:
+        from feature_engineering import (
+            FEATURE_COLUMNS,
+            row_to_feature_vector,
+            generate_risk_explanation,
+        )
+    except (ImportError, ValueError):
+        from ML.risk_prediction.feature_engineering import (
+            FEATURE_COLUMNS,
+            row_to_feature_vector,
+            generate_risk_explanation,
+        )
 
 
 class RiskPredictor:
@@ -14,6 +37,11 @@ class RiskPredictor:
     """
 
     def __init__(self, model_path: str = "ML/risk_prediction/model.pkl"):
+        # Resolve path dynamically if default path doesn't exist
+        if not os.path.exists(model_path):
+            local_path = os.path.join(os.path.dirname(__file__), "model.pkl")
+            if os.path.exists(local_path):
+                model_path = local_path
         self.model_path = model_path
         self.model_payload: Optional[Dict[str, Any]] = None
         self._load_model()

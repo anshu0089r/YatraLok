@@ -1,5 +1,24 @@
+import os
+import sys
 from typing import Dict, List, Optional, Any
-from .zone_checker import ZoneChecker
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
+
+try:
+    from .zone_checker import ZoneChecker
+    from .haversine import haversine_distance
+except (ImportError, ValueError):
+    try:
+        from geofencing.zone_checker import ZoneChecker
+        from geofencing.haversine import haversine_distance
+    except (ImportError, ValueError):
+        from ML.geofencing.zone_checker import ZoneChecker
+        from ML.geofencing.haversine import haversine_distance
 
 
 class GeofenceService:
@@ -36,7 +55,6 @@ class GeofenceService:
 
         # Find all zone_ids tourist is currently inside
         for zone in active_zones:
-            from .haversine import haversine_distance
             dist = haversine_distance(latitude, longitude, zone["latitude"], zone["longitude"])
             if dist <= zone["radius"]:
                 current_zones.add(zone.get("zone_id", zone.get("zone_name", "unknown")))

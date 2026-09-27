@@ -1,8 +1,32 @@
+import os
+import sys
+
+# Add both repo root and ML folder to sys.path for universal import compatibility
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ML_DIR = os.path.dirname(_CURRENT_DIR)
+_ROOT_DIR = os.path.dirname(_ML_DIR)
+for _p in [_ROOT_DIR, _ML_DIR, _CURRENT_DIR]:
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
+
 from flask import Flask, request, jsonify
-from ML.geofencing.zone_checker import ZoneChecker
-from ML.geofencing.geofence_service import GeofenceService
-from ML.movement_analysis.movement_features import MovementFeatureExtractor
-from ML.risk_prediction.predict import RiskPredictor
+
+try:
+    from ..geofencing.zone_checker import ZoneChecker
+    from ..geofencing.geofence_service import GeofenceService
+    from ..movement_analysis.movement_features import MovementFeatureExtractor
+    from ..risk_prediction.predict import RiskPredictor
+except (ImportError, ValueError):
+    try:
+        from ML.geofencing.zone_checker import ZoneChecker
+        from ML.geofencing.geofence_service import GeofenceService
+        from ML.movement_analysis.movement_features import MovementFeatureExtractor
+        from ML.risk_prediction.predict import RiskPredictor
+    except (ImportError, ValueError):
+        from geofencing.zone_checker import ZoneChecker
+        from geofencing.geofence_service import GeofenceService
+        from movement_analysis.movement_features import MovementFeatureExtractor
+        from risk_prediction.predict import RiskPredictor
 
 app = Flask(__name__)
 
